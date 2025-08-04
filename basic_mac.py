@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import subprocess
 import optparse
+import re
 
 
 def get_arguments() :
@@ -21,8 +22,22 @@ def change_mac(interface, new_mac):
     subprocess. call(["sudo", "ifconfig", interface, "hw", "ether", new_mac])
     subprocess.call (["sudo", "ifconfig", interface, "up"])
 
-options = get_arguments()
-change_mac(options.interface, options.new_mac)
 
-ifconfig_result = subprocess.check_output(["ifconfig", options.interface])
-print(ifconfig_result)
+def get_changed_mac(interface):
+    ifconfig_result = str(subprocess.check_output(["ifconfig", interface]))
+    regex_match_mac = re.search(r"((\w){2}:){5}(\w){2}", ifconfig_result)
+    return regex_match_mac.group(0) if regex_match_mac else None
+
+
+options = get_arguments()
+current_mac = get_changed_mac(options.interface)
+print("Current MAC Address:", current_mac) if current_mac else print("Could not get the MAC")
+
+change_mac(options.interface, options.new_mac)
+updated_mac = get_changed_mac(options.interface)
+
+
+if updated_mac == options.new_mac:
+    print("[+] MAC Address successfully changed to:", updated_mac)
+else:
+    print("[+] Could not change the MAC Address.")
