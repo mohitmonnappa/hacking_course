@@ -26,11 +26,11 @@ def print_results(results_list):
 
 def ip_input():
     parser = optparse.OptionParser()
-    parser.add_option("-r", "--ip_address_range", dest="ip_range", help="IP range to scan for devices")
+    parser.add_option("-t", "--target", dest="target", help="IP range to scan for devices")
     (options, arguments) = parser.parse_args()
-    if not options.ip_range:
+    if not options.target:
         parser.error("Please specify an IP range.")
-    return options.ip_range
+    return options.target
 
 ip = ip_input()
 print_results(scan(ip))
