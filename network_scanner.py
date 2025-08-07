@@ -1,5 +1,6 @@
 #!/bin/python3
 from scapy import all as scapy
+import optparse
 
 
 def scan(ip):
@@ -16,12 +17,23 @@ def scan(ip):
         clients_list.append(dict_answered_packets)
     return clients_list
 
+
 def print_results(results_list):
     print("IP\t\t\tMAC")
     for client in results_list:
         print(client['ip'],"\t", client['mac'])
 
-scan("192.168.68.0/24")
+
+def ip_input():
+    parser = optparse.OptionParser()
+    parser.add_option("-r", "--ip_address_range", dest="ip_range", help="IP range to scan for devices")
+    (options, arguments) = parser.parse_args()
+    if not options.ip_range:
+        parser.error("Please specify an IP range.")
+    return options.ip_range
+
+ip = ip_input()
+print_results(scan(ip))
 
 # Output:
 # IP			            MAC
