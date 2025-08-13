@@ -10,9 +10,9 @@ def scan(ip):
     # srp returns 2 lists by default: answered packets and unanswered packets
     answered_packets = scapy.srp(arp_broadcast, timeout=1, verbose=False)[0 ] # srp sends packets with our user defined frame
     clients_list = []
-    for i in answered_packets:
+    for element in answered_packets:
         dict_answered_packets = {}
-        ip, mac = str(i[1].psrc), str(i[1].hwsrc)
+        ip, mac = str(element[1].psrc), str(element[1].hwsrc)
         dict_answered_packets["ip"], dict_answered_packets["mac"] = ip, mac
         clients_list.append(dict_answered_packets)
     return clients_list
@@ -26,11 +26,12 @@ def print_results(results_list):
 
 def ip_input():
     parser = optparse.OptionParser()
-    parser.add_option("-t", "--target", dest="target", help="IP range to scan for devices")
+    parser.add_option("-r", "--range", dest="range", help="IP range to scan for devices")
     (options, arguments) = parser.parse_args()
-    if not options.target:
-        parser.error("Please specify an IP range.")
-    return options.target
+    if not options.range:
+        parser.error("[-] Please specify an IP range. Use --help for more info")
+    return options.range
+
 
 ip = ip_input()
 print_results(scan(ip))
