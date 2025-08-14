@@ -9,10 +9,10 @@ def scan(ip):
     arp_broadcast = broadcast/arp_request # / is used to append
     # srp returns 2 lists by default: answered packets and unanswered packets
     answered_packets = scapy.srp(arp_broadcast, timeout=1, verbose=False)[0 ] # srp sends packets with our user defined frame
-    clients_list = []
+    clients_list = [] # list of ip and mac of hosts connected
     for element in answered_packets:
         dict_answered_packets = {}
-        ip, mac = str(element[1].psrc), str(element[1].hwsrc)
+        ip, mac = str(element[1].psrc), str(element[1].hwsrc) # 2nd element has packet details
         dict_answered_packets["ip"], dict_answered_packets["mac"] = ip, mac
         clients_list.append(dict_answered_packets)
     return clients_list

