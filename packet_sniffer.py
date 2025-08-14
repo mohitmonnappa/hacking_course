@@ -1,5 +1,6 @@
 #!/bin/python3
 import scapy.all as scapy
+from scapy.layers import http
 
 
 def sniff(interface):
@@ -7,6 +8,7 @@ def sniff(interface):
 
 
 def packet_function(packet):
-    print(packet)
+    if packet.haslayer(http.HTTPRequest):
+        print(packet)
 
 sniff("wlan0")
