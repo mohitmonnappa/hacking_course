@@ -38,7 +38,7 @@ def run():
         spoof(target_ip, router_ip)
         spoof(router_ip, target_ip)
         packets_sent_count += 2
-        print(f"[+] Packets Sent: {packets_sent_count}")
+        print(f"\r[+] Packets Sent: {packets_sent_count}", end="")
         time.sleep(2)
 
 
