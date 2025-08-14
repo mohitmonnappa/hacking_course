@@ -11,6 +11,7 @@ def packet_function(packet):
     if packet.haslayer(http.HTTPRequest):
         url = packet[http.HTTPRequest].Host + packet[http.HTTPRequest].Path
         print(url)
+    if packet.haslayer(scapy.Raw):
         if packet.haslayer(scapy.Raw):
             load = packet[scapy.Raw].load
             keywords = ["username", "uname", "login", "password", "pass"]
